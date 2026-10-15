@@ -1,0 +1,4 @@
+# Ignore macOS metadata files
+.DS_Store
+*.h5
+*__.dat
