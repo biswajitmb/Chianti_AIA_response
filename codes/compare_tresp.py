@@ -10,7 +10,7 @@ import os, glob
 DataDir = './../outputs/'
 new_tresp_files = glob.glob(os.path.join(DataDir,'*.sav'))
 
-ssw_aia_resp_file = './../effective_area/SSW_tresp/aia_tresp_May012010_temp.sav'
+ssw_aia_resp_file = './../effective_area/SSW_tresp/aia_tresp_May012010_temp_nochiantifix_noevnorm.sav'
 #ssw_aia_resp_file = './../effective_area/SSW_tresp/aia_tresp_Oct012026.sav'
 
 ssw_aia_tresp = readsav(ssw_aia_resp_file)

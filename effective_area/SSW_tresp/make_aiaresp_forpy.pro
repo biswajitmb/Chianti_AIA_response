@@ -13,16 +13,16 @@ pro make_aiaresp_forpy
   ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   ;  tresp=aia_get_response(/temperature,/dn,/eve,timedepend_date='01-Jul-2010')
-  ;tresp=aia_get_response(/temperature,/dn,/eve)
-  tresp=aia_get_response(/temperature,/dn,/evenorm,timedepend_date='30-Jul-2021',/chiantifix)
+  ;tresp=aia_get_response(/temperature,/dn,/evenorm)
+  tresp=aia_get_response(/temperature,/dn,timedepend_date='1-May-2010');,/area);,/chiantifix);,/evenorm
 
-  ids=[0,1,2,3,4,6,7]
-  channels=tresp.channels[ids]
-  logt=tresp.logte
-  tr=tresp.all[*,ids]
-  units=tresp.units
+  ;ids=[0,1,2,3,4,6,7]
+  ;channels=tresp.channels[ids]
+  ;logt=tresp.logte
+  ;tr=tresp.all[*,ids]
+  ;units=tresp.units
 
-  save,file='aia_tresp_30072021'+'.sav',channels,logt,tr,units
+  save,file='aia_tresp_May012010_temp_nochiantifix_noevnorm'+'.sav',tresp
 
   stop
 end

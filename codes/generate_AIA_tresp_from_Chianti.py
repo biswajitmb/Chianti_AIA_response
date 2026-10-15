@@ -25,8 +25,8 @@ import h5py
 from datetime import datetime, timezone
 ###########################
 
-abund_file_name = 'sun_coronal_1992_feldman_ext'
-#abund_file_name = 'sun_photospheric_2021_asplund'
+#abund_file_name = 'sun_coronal_1992_feldman_ext'
+abund_file_name = 'sun_photospheric_2021_asplund'
 #abund_file_name = 'sun_coronal_2021_chianti'
 #abund_file_name = 'sun_photospheric_2015_scott' 
 
@@ -42,7 +42,7 @@ channels = [94,131,171,193,211,304,335]
 DN2Ph = [2.128,1.523,1.168,1.024,0.946,0.658,0.596] #not used. Effective area estimated from SSW (with /DN keyward) already included this conversion to the effective area.
 
 EA_files_Dir = './../effective_area'
-ssw_rsp_file = EA_files_Dir+'/SSW_tresp/aia_tresp_May012010_area.sav' #Note: this EA was calculated using /DN, so Ph2DN is applied
+ssw_rsp_file = EA_files_Dir+'/SSW_tresp/aia_tresp_May012010_area_nochiantifix_noevnorm.sav' #Note: this EA was calculated using /DN, so Ph2DN is applied
 plate_scale= 0.6 #in arcsec
 
 OutDir = 'outputs'
@@ -157,7 +157,7 @@ plt.legend()
 plt.show()
 
 #compare with standerd AIA response:
-ssw_rsp_file = EA_files_Dir+'/SSW_tresp/aia_tresp_May012010_temp.sav'
+ssw_rsp_file = EA_files_Dir+'/SSW_tresp/aia_tresp_May012010_temp_nochiantifix_noevnorm.sav'
 aia_tresp = readsav(ssw_rsp_file)
 for fil_aia in np.arange(len(aia_tresp['tresp'].channels[0])):
     aia_tresp['tresp'].channels[0][fil_aia] = aia_tresp['tresp'].channels[0][fil_aia].decode('utf-8')

@@ -86,7 +86,7 @@ PRO make_idl_format
 
     COMPILE_OPT IDL2
 
-    base_file = './../effective_area/SSW_tresp/aia_tresp_May012010_temp.sav'
+    base_file = './../effective_area/SSW_tresp/aia_tresp_May012010_temp_nochiantifix_noevnorm.sav'
 
     hdf_file = 'aia_tresp_sun_photospheric_2021_asplund_EA01May2010'
     ;hdf_file = 'aia_tresp_sun_coronal_1992_feldman_ext_EA01May2010'
