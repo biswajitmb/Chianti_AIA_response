@@ -86,15 +86,15 @@ PRO make_idl_format
 
     COMPILE_OPT IDL2
 
-    base_file = './outputs/aia_tresp_base.sav'
+    base_file = './../effective_area/SSW_tresp/aia_tresp_May012010_temp.sav'
 
-    ;hdf_file = 'aia_tresp_sun_photospheric_2021_asplund'
-    hdf_file = 'aia_tresp_sun_coronal_1992_feldman_ext'
-    ;hdf_file = 'aia_tresp_sun_photospheric_2015_scott'
-    ;hdf_file = 'aia_tresp_sun_coronal_2021_chianti'
+    hdf_file = 'aia_tresp_sun_photospheric_2021_asplund_EA01May2010'
+    ;hdf_file = 'aia_tresp_sun_coronal_1992_feldman_ext_EA01May2010'
+    ;hdf_file = 'aia_tresp_sun_photospheric_2015_scott_EA01May2010'
+    ;hdf_file = 'aia_tresp_sun_coronal_2021_chianti_EA01May2010'
 
-    h5_path = './outputs/' + hdf_file + '.h5'
-    sav_path = './outputs/' + hdf_file + '.sav'
+    h5_path = './../outputs/' + hdf_file + '.h5'
+    sav_path = './../outputs/' + hdf_file + '.sav'
 
     ;--------------------------------------------------------
     ; 1. Restore original response
@@ -123,10 +123,6 @@ PRO make_idl_format
 
     PRINT, 'First five temperature values:'
     PRINT, logT_raw[0:4]
-
-    ; IMPORTANT:
-    ; Assumes the HDF5 dataset contains log10(T/K).
-    ; Do not apply ALOG10 unless it contains Kelvin.
 
     IF (MIN(logT_raw) GT 4.0) AND $
        (MAX(logT_raw) LT 9.0) THEN BEGIN
@@ -172,12 +168,6 @@ PRO make_idl_format
     ;
     ; /metadata/NAME
     ;
-    ; The code updates an existing top-level tag NAME.
-    ; Unknown tags are not inserted, preserving the
-    ; original AIA structure.
-    ;
-    ; Only metadata fields explicitly listed below are
-    ; considered. Add other known tag names as needed.
 
     metadata_names = ['CHIANTI_VERSION', 'ABUNDANCE', $
                       'IONIZATION', 'DATE']

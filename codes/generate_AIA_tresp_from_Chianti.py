@@ -1,3 +1,18 @@
+'''
+Purpose: Generate AIA temperature response using Chinativ11 specrum.
+	Chianti spectrum is pre-calculated for unit abundances.
+	Appropriate abundance will apply before creating AIA response.
+	It will use AIA pre-calculated effective area from SSW
+
+Note on pre-calculated AIA effective area from SSW:
+	tresp=aia_get_response(/dn,/evenorm,timedepend_date='1-May-2010',/chiantifix,/area)
+        - The output EA will include photon to DN conversion factor applied
+ 	- The EA also apply the time-dependent degradation factor
+	- The EA does not apply any factor for '/chiantifix'
+-Biswajit, Oct-10-2026
+'''
+
+
 import matplotlib
 matplotlib.use('QtAgg')
 import numpy as np
@@ -10,22 +25,24 @@ import h5py
 from datetime import datetime, timezone
 ###########################
 
-#abund_file_name = 'sun_coronal_1992_feldman_ext'
+abund_file_name = 'sun_coronal_1992_feldman_ext'
 #abund_file_name = 'sun_photospheric_2021_asplund'
-abund_file_name = 'sun_coronal_2021_chianti'
+#abund_file_name = 'sun_coronal_2021_chianti'
 #abund_file_name = 'sun_photospheric_2015_scott' 
 
-#abundance_file = os.path.join('/Users/bmondal/BM_Works/softwares/Chianti/CHIANTI_11.0.2_database/abundance/archive',r'..',abund_file_name+'.abund')
+abundance_file = os.path.join('/Users/bmondal/BM_Works/softwares/Chianti/CHIANTI_11.0.2_database/abundance/archive',
+    r'..',
+    abund_file_name+'.abund')
 
-abundance_file = os.path.join(abund_file_name+'.abund')
+#abundance_file = os.path.join(abund_file_name+'.abund')
 
 ChiantiTable = '/Users/bmondal/BM_Works/softwares/Chianti/BM_table/Chiantiv11_1to1000A_d1mA/AllSpec_formated_Chiantiv11_1to1000A_d1mA.fits'
 
 channels = [94,131,171,193,211,304,335]
-DN2Ph = [2.128,1.523,1.168,1.024,0.946,0.658,0.596] #not used. Whithout this conversion matching with the AIA Tresp.
-
+DN2Ph = [2.128,1.523,1.168,1.024,0.946,0.658,0.596] #not used. Effective area estimated from SSW (with /DN keyward) already included this conversion to the effective area.
 
 EA_files_Dir = './../effective_area'
+ssw_rsp_file = EA_files_Dir+'/SSW_tresp/aia_tresp_May012010_area.sav' #Note: this EA was calculated using /DN, so Ph2DN is applied
 plate_scale= 0.6 #in arcsec
 
 OutDir = 'outputs'
@@ -36,8 +53,6 @@ elemZ_unknown_abund = []#[7.55, 6.43, 7.51, 7.12, 7.46] #abundances in log scale
 dlamda_in = 0.001 #in A. Resolution of the incident wavelength array (used in 'generate_instrument_response.py') in response.
 
 logT = np.arange(start=4.1,stop=8.9,step=0.1)
-
-OutFile_name = 'AIA_LowHigh_FIP_Tresp.fits'
 
 ############################
 
@@ -102,23 +117,30 @@ else:
     M = np.zeros([len(logT),len(channels)])
     spectral_comp = 1
 
+#Read AIA SSW response to read effective areas. 
+#Note: these effective areas are apply for evenorm
+aia_tresp = readsav(ssw_rsp_file)
+for fil_aia in np.arange(len(aia_tresp['tresp'].channels[0])):
+    aia_tresp['tresp'].channels[0][fil_aia] = aia_tresp['tresp'].channels[0][fil_aia].decode('utf-8')
+chans=np.array(aia_tresp['tresp'].channels[0])
+#aia_tresp_logT = aia_tresp['tresp'].logte[0]
+wvl = aia_tresp['tresp'].WAVE[0]
+area = aia_tresp['tresp'].ALL[0] #[wvl,channels]
 
 for i in range(len(channels)):
-    EA_file = os.path.join(EA_files_Dir,'aia_EffArea_'+format('%d'%i)+'__A'+format('%d'%channels[i])+'__.dat')
-    wvl, EA = np.loadtxt(EA_file,unpack=True)
+    #EA_file = os.path.join(EA_files_Dir,'aia_EffArea_'+format('%d'%i)+'__A'+format('%d'%channels[i])+'__.dat')
+    #wvl, EA = np.loadtxt(EA_file,unpack=True)
+    c = np.where(chans == 'A'+str(channels[i]))[0][0]
+    EA = area[:,c]
     EA_intpf = interpolate.interp1d(wvl, EA,bounds_error=False,fill_value=0)
 
     EA_spec = EA_intpf(ch_ene)
-    '''
-    plt.plot(wvl, EA)
-    plt.plot(ch_ene,EA_spec,'--')
-    plt.show()
-    '''
+    
     for t in range(len(logT)):
         if FIP_var is True: 
             M[t,0,i] = np.sum(total_spec_KnownElem[t,:]*EA_spec) #for High-FIP
             M[t,1,i] = np.sum(total_spec_Elem_LowFIP[t,:]*EA_spec) #for low FIP
-            M[t,:,i] = (M[t,:,i]/chiso_conversion_fact)#*DN2Ph[i]
+            M[t,:,i] = (M[t,:,i]/chiso_conversion_fact)#/DN2Ph[i]
         else:
             M[t,i] = np.sum(total_spec_KnownElem[t,:]*EA_spec)
             M[t,i] = (M[t,i]/chiso_conversion_fact)#/DN2Ph[i] #DN cm^-5 /s/pix
@@ -128,18 +150,14 @@ for i in range(len(channels)):
     plt.plot(logT,M[:,i],'-',label=format('%d'%channels[i]),color=color[i])
     #plt.plot(logT,M[:,1,i],'--',color=color[i])
 plt.yscale('log')
-plt.ylabel('Ph cm$^5$ s$^{-1}$')
+plt.ylabel('DN cm$^5$ s$^{-1}$')
 plt.xlabel('logT')
 plt.xlim([logT[0],logT[-1]])
 plt.legend()
 plt.show()
 
-outfile = os.path.join(OutDir,OutFile_name)
-
 #compare with standerd AIA response:
-ssw_rsp_file = EA_files_Dir+'/SSW_tresp/aia_tresp_Oct012026.sav'
-
-#AIA
+ssw_rsp_file = EA_files_Dir+'/SSW_tresp/aia_tresp_May012010_temp.sav'
 aia_tresp = readsav(ssw_rsp_file)
 for fil_aia in np.arange(len(aia_tresp['tresp'].channels[0])):
     aia_tresp['tresp'].channels[0][fil_aia] = aia_tresp['tresp'].channels[0][fil_aia].decode('utf-8')
@@ -155,7 +173,7 @@ for i in range(len(chans)):
     plt.plot(logT,M[:,i],'--',color=line.get_color())
 
     plt.yscale('log')
-    plt.ylabel('Ph cm$^5$ s$^{-1}$')
+    plt.ylabel('DN cm$^5$ s$^{-1}$')
     plt.xlabel('logT')
 #plt.plot(logT,np.sum(M[:,:,-1],axis=1),'--')
 
@@ -169,7 +187,7 @@ channels = ['A94', 'A131', 'A171', 'A193', 'A211', 'A304', 'A335']
 assert logT.shape == (len(logT),)
 assert M.shape == (len(logT), len(channels))
 
-with h5py.File(os.path.join('./../outputs/','aia_tresp_'+abund_file_name+'.h5'), 'w') as f:
+with h5py.File(os.path.join('./../outputs/','aia_tresp_'+abund_file_name+'_EA01May2010.h5'), 'w') as f:
 
     # ========================================================
     # Global metadata / file header

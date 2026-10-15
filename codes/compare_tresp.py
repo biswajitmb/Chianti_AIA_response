@@ -10,8 +10,8 @@ import os, glob
 DataDir = './../outputs/'
 new_tresp_files = glob.glob(os.path.join(DataDir,'*.sav'))
 
-#ssw_aia_resp_file = './../effective_area/SSW_tresp/aia_tresp_base.sav'
-ssw_aia_resp_file = './../effective_area/SSW_tresp/aia_tresp_Oct012026.sav'
+ssw_aia_resp_file = './../effective_area/SSW_tresp/aia_tresp_May012010_temp.sav'
+#ssw_aia_resp_file = './../effective_area/SSW_tresp/aia_tresp_Oct012026.sav'
 
 ssw_aia_tresp = readsav(ssw_aia_resp_file)
 
@@ -49,7 +49,7 @@ for i in range(len(chans)):
     plt.yscale('log')
     plt.ylabel('DN cm$^5$ s$^{-1}$')
     plt.xlabel('logT')
-    plt.ylim([1.0e-29,1.0e-24])
+    plt.ylim([1.0e-29,5.0e-24])
     plt.xlim([4.5,8.5])
     plt.legend()
     plt.savefig(os.path.join('plots',chans[i]+'.png'))
