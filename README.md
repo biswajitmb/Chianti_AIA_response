@@ -10,6 +10,35 @@ AIA temperature response functions depend on the adopted atomic data, elemental 
 - Recalculate responses using the updated atomic data in **CHIANTI v11**.
 - Compare independently calculated responses with **SolarSoft/SSW** reference responses.
 
+## Description of Response Files
+
+The newly generated SDO/AIA temperature response files are available in the `output/` directory.
+
+- The response files follow a structure similar to the standard SolarSoftWare AIA temperature response files.
+- Each file is saved in IDL `.sav` format for compatibility with existing SSW/IDL workflows.
+- The filenames indicate the elemental abundance model and the effective area calibration used to generate the temperature responses.
+
+### File Naming Convention
+
+Example:
+
+`aia_tresp_sun_coronal_1992_feldman_ext_EA01May2010.sav`
+
+The filename contains the following information:
+
+- **`aia_tresp`**: SDO/AIA temperature response function.
+- **`sun_coronal_1992_feldman_ext`**: CHIANTI elemental abundance file based on the coronal abundances of Feldman (1992).
+- **`EA01May2010`**: AIA effective area corresponding to May 1, 2010.
+- **`.sav`**: IDL save-file format.
+
+### EVE-Normalized Response Files
+
+The response files located in the `outputs/with_evenorm/` directory include the EVE normalization corrections, applied following the same procedure used by SSW when the `/evenorm` keyword is enabled in `aia_get_response.pro`.
+
+These corrections account for empirical adjustments to the AIA temperature responses based on comparisons with observations from the Extreme Ultraviolet Variability Experiment (EVE).
+
+These files can be loaded into IDL using the `RESTORE` command and used for temperature response calculations and differential emission measure (DEM) analysis.
+
 ## Method
 
 For each AIA channel, the CHIANTI synthetic spectrum is folded through the wavelength-dependent AIA effective area. Detector conversion and normalization factors are applied as required by the chosen response units.
