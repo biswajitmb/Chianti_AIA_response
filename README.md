@@ -47,7 +47,7 @@ The seven EUV channels considered are **94, 131, 171, 193, 211, 304, and 335 Å*
 
 ## Repository contents
 
-- `codes/generate_AIA_tresp_from_Chianti.py` — generate temperature response functions. The scripts require precomputed CHIANTI spectral emissivity tables, generated assuming a constant electron pressure of \(P_e/k_B = 10^{15}\ \mathrm{cm^{-3}\,K}\). Due to their large file sizes, these tables are not included in the repository.
+- `codes/generate_AIA_tresp_from_Chianti.py` — generate temperature response functions. The scripts require precomputed CHIANTI spectral emissivity tables, generated assuming a constant electron pressure of ($P_e/k_B = 3 \times 10^{15}\ \mathrm{cm^{-3}\,K}$). Due to their large file sizes, these tables are not included in the repository.
 - `codes/compare_tresp.py` — compare response functions.
 - `codes/make_idl_format.pro` — Convert the geerated HDF5 (.h5) files to SSW IDL (.sav) format.
 - `effective_area/` — AIA effective-area and reference-response utilities.
